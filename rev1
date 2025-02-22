@@ -1,0 +1,20 @@
+- name: Gather data
+  hosts: bgpq4-server
+  gather_facts: false
+  tasks:
+    - name: Run bgpq4
+      command: bgpq4 -l in_as46261_v4 -s4 AS-QP
+      register: bgpq4_output
+- name: Update eqx-rtbh
+  hosts: eqx-rtbh
+  gather_facts: false
+  tasks:
+    - name: Config mode
+      command: config t
+    - name: Paste data
+      command: "{{ item }}"
+      loop: "{{ bgpq4_output.stdout_lines }}"
+    - name: End
+      command: end
+    - name: Exit
+      command: exit
